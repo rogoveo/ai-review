@@ -37,6 +37,12 @@ async def test_get_review_info_returns_valid_schema(
     called_methods = [name for name, _ in fake_azure_devops_pull_requests_http_client.calls]
     assert called_methods == ["get_pull_request", "get_files"]
 
+    # Verify change_tracking_ids were properly populated from PR files response (issue #89 fix)
+    assert azure_devops_vcs_client.change_tracking_ids == {
+        "src/app.py": 1,
+        "src/utils/helper.py": 2,
+    }
+
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("azure_devops_http_client_config")
@@ -101,6 +107,9 @@ async def test_create_inline_comment_posts_comment_with_context(
         fake_azure_devops_pull_requests_http_client: FakeAzureDevOpsPullRequestsHTTPClient,
 ):
     """Should create inline comment with proper thread context."""
+    # First call get_review_info to populate change_tracking_ids
+    await azure_devops_vcs_client.get_review_info()
+    
     await azure_devops_vcs_client.create_inline_comment("src/app.py", 10, "Looks good!")
 
     calls = [args for name, args in fake_azure_devops_pull_requests_http_client.calls if name == "create_thread"]
@@ -111,6 +120,8 @@ async def test_create_inline_comment_posts_comment_with_context(
     assert request.thread_context.file_path == "src/app.py"
     assert request.thread_context.right_file_start.line == 10
     assert request.comments[0].content == "Looks good!"
+    # Verify correct change_tracking_id is used based on file path (issue #89 fix)
+    assert request.pull_request_thread_context.change_tracking_id == 1
 
 
 @pytest.mark.asyncio
@@ -277,3 +288,48 @@ async def test_delete_inline_comment_calls_delete_thread(
     assert call_args["project"] == "proj"
     assert call_args["repository_id"] == "repo123"
     assert call_args["pull_request_id"] == 5
+
+
+@pytest.mark.asyncio
+@pytest.mark.usefixtures("azure_devops_http_client_config")
+async def test_create_inline_comment_uses_correct_change_tracking_id_per_file(
+        azure_devops_vcs_client: AzureDevOpsVCSClient,
+        fake_azure_devops_pull_requests_http_client: FakeAzureDevOpsPullRequestsHTTPClient,
+):
+    """Should use file-specific change_tracking_id instead of hardcoded 1 (issue #89)."""
+    # Populate change_tracking_ids from PR files
+    await azure_devops_vcs_client.get_review_info()
+
+    # Comment on first file (change_tracking_id = 1)
+    await azure_devops_vcs_client.create_inline_comment("src/app.py", 5, "Comment 1")
+
+    # Comment on second file (change_tracking_id = 2)
+    await azure_devops_vcs_client.create_inline_comment("src/utils/helper.py", 15, "Comment 2")
+
+    calls = [args for name, args in fake_azure_devops_pull_requests_http_client.calls if name == "create_thread"]
+    assert len(calls) == 2
+
+    # First comment should use tracking ID 1
+    assert calls[0]["request"].pull_request_thread_context.change_tracking_id == 1
+    # Second comment should use tracking ID 2
+    assert calls[1]["request"].pull_request_thread_context.change_tracking_id == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.usefixtures("azure_devops_http_client_config")
+async def test_create_inline_comment_fallback_to_default_change_tracking_id(
+        azure_devops_vcs_client: AzureDevOpsVCSClient,
+        fake_azure_devops_pull_requests_http_client: FakeAzureDevOpsPullRequestsHTTPClient,
+):
+    """Should fallback to 1 for unknown files without change_tracking_id."""
+    # Populate change_tracking_ids
+    await azure_devops_vcs_client.get_review_info()
+
+    # Comment on a file not in the PR
+    await azure_devops_vcs_client.create_inline_comment("unknown/file.py", 10, "Comment")
+
+    calls = [args for name, args in fake_azure_devops_pull_requests_http_client.calls if name == "create_thread"]
+    assert len(calls) == 1
+
+    # Should fallback to default value 1
+    assert calls[0]["request"].pull_request_thread_context.change_tracking_id == 1
