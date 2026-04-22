@@ -34,11 +34,24 @@ If running outside Docker, make sure this option is enabled manually.
 
 ```text
 git diff <BASE_SHA> <HEAD_SHA> ... returned exit status 128
+fatal: bad object <BASE_SHA>
 ```
 
 ### Cause
 
 One of the compared commits is not present locally. This usually happens due to **shallow clones in CI**.
+
+For GitLab merge requests this can also appear when the GitLab API returns a changed file with:
+
+```json
+{
+  "collapsed": true,
+  "diff": ""
+}
+```
+
+In that case `ai-review` must reconstruct the patch through local `git diff`, so the checkout must contain both
+`diff_refs.base_sha` and `diff_refs.head_sha`.
 
 ### Solution
 
@@ -65,5 +78,13 @@ Or manually:
 git fetch --unshallow
 ```
 
+To verify the job has the required commits, run this in the same CI job before `ai-review run`:
+
+```bash
+git cat-file -e "$BASE_SHA^{commit}"
+git cat-file -e "$HEAD_SHA^{commit}"
+```
+
+For GitLab CI you can use the MR diff refs from the API response, or print the exact SHAs from the `ai-review` logs.
 
 
