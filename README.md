@@ -6,9 +6,6 @@
 
 AI-powered code review tool.
 
-[![CI](https://github.com/Nikita-Filonov/ai-review/actions/workflows/workflow-test.yml/badge.svg)](https://github.com/Nikita-Filonov/ai-review/actions/workflows/workflow-test.yml)
-[![codecov](https://codecov.io/gh/Nikita-Filonov/ai-review/branch/main/graph/badge.svg)](https://codecov.io/gh/Nikita-Filonov/ai-review)
-[![PyPI version](https://img.shields.io/pypi/v/xai-review.svg)](https://pypi.org/project/xai-review/)
 [![License](https://img.shields.io/github/license/Nikita-Filonov/ai-review)](./LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/Nikita-Filonov/ai-review?style=social)](https://github.com/Nikita-Filonov/ai-review/stargazers)
 [![Support](https://img.shields.io/badge/Support-Boosty-orange)](https://boosty.to/ai_review)
@@ -38,7 +35,6 @@ Your support helps to:
 - 🧪 [Live Preview](#-live-preview)
 - 🚀 [Quick Start](#-quick-start)
 - ⚙️ [️CI/CD Integration](#-cicd-integration)
-    - 🚀 [GitHub Actions](#-github-actions)
     - 🚀 [GitLab CI/CD](#-gitlab-cicd)
 - 📘 [Documentation](#-documentation)
 - ⚠️ [Privacy & Responsibility Notice](#-privacy--responsibility-notice)
@@ -84,7 +80,7 @@ mode:
 | 💬 Inline Reply  | Generates a **context-aware reply** to an existing inline comment thread. Can clarify decisions, propose fixes, or provide code suggestions. | [View on GitHub](https://github.com/Nikita-Filonov/ai-review/pull/16) | [View on GitLab](https://gitlab.com/core8332439/review/-/merge_requests/5) | [View on Bitbucket](https://bitbucket.org/test-5183/test-ai-review/pull-requests/5) |
 | 💬 Summary Reply | Continues the **summary-level review discussion**, responding to reviewer comments with clarifications, rationale, or actionable next steps. | [View on GitHub](https://github.com/Nikita-Filonov/ai-review/pull/17) | [View on GitLab](https://gitlab.com/core8332439/review/-/merge_requests/6) | [View on Bitbucket](https://bitbucket.org/test-5183/test-ai-review/pull-requests/6) |
 
-👉 Each review was generated automatically via GitHub Actions using the corresponding mode:
+Available review modes:
 
 ```bash
 ai-review run-inline
@@ -98,23 +94,29 @@ ai-review run-summary-reply
 
 ## 🚀 Quick Start
 
-Install via **pip**:
+Build the Docker image from this repository:
 
 ```bash
-pip install xai-review
+docker build -t ai-review:local .
 ```
 
-📦 Available on [PyPI](https://pypi.org/project/xai-review/)
-
----
-
-Or run directly via Docker:
+Tag and push it to the registry used by your CI runners:
 
 ```bash
-docker run --rm -v $(pwd):/app nikitafilonov/ai-review:latest ai-review run-summary
+docker tag ai-review:local registry.example.com/ai-review:latest
+docker push registry.example.com/ai-review:latest
 ```
 
-🐳 Pull from [DockerHub](https://hub.docker.com/r/nikitafilonov/ai-review)
+Run AI Review against a checked-out repository:
+
+```bash
+docker run --rm \
+  -v "$PWD:/workspace" \
+  -w /workspace \
+  --env-file .env \
+  ai-review:local \
+  ai-review run-summary
+```
 
 👉 Before running, create a basic configuration file [.ai-review.yaml](./docs/configs/.ai-review.yaml) in the root of
 your project:
@@ -188,63 +190,6 @@ Each integration uses environment variables for LLM and VCS configuration.
 
 > For full configuration details (timeouts, artifacts, logging, prompt overrides), see [./docs/configs](./docs/configs).
 
-### 🚀 GitHub Actions
-
-Add a workflow like this (manual trigger from **Actions** tab):
-
-```yaml
-name: AI Review
-
-on:
-  workflow_dispatch:
-    inputs:
-      review-command:
-        type: choice
-        default: run
-        options:
-          - run
-          - run-inline
-          - run-context
-          - run-summary
-          - run-inline-reply
-          - run-summary-reply
-          - clear-inline
-          - clear-summary
-      pull-request-number:
-        type: string
-        required: true
-jobs:
-  ai-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: Nikita-Filonov/ai-review@v0.64.0
-        with:
-          review-command: ${{ inputs.review-command }}
-        env:
-          # --- LLM configuration ---
-          LLM__PROVIDER: "OPENAI"
-          LLM__META__MODEL: "gpt-4o-mini"
-          LLM__META__MAX_TOKENS: "15000"
-          LLM__META__TEMPERATURE: "0.3"
-          LLM__HTTP_CLIENT__API_URL: "https://api.openai.com/v1"
-          LLM__HTTP_CLIENT__API_TOKEN: ${{ secrets.OPENAI_API_KEY }}
-
-          # --- GitHub integration ---
-          VCS__PROVIDER: "GITHUB"
-          VCS__PIPELINE__OWNER: ${{ github.repository_owner }}
-          VCS__PIPELINE__REPO: ${{ github.event.repository.name }}
-          VCS__PIPELINE__PULL_NUMBER: ${{ inputs.pull-request-number }}
-          VCS__HTTP_CLIENT__API_URL: "https://api.github.com"
-          VCS__HTTP_CLIENT__API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-```
-
-🔗 Full example: [./docs/ci/github.yaml](./docs/ci/github.yaml)
-
 ### 🚀 GitLab CI/CD
 
 For GitLab users:
@@ -253,12 +198,14 @@ For GitLab users:
 ai-review:
   when: manual
   stage: review
-  image: nikitafilonov/ai-review:latest
+  image: registry.example.com/ai-review:latest
   rules:
     - if: '$CI_MERGE_REQUEST_IID'
   script:
     - ai-review run
   variables:
+    GIT_DEPTH: "0"
+
     # --- LLM configuration ---
     LLM__PROVIDER: "OPENAI"
     LLM__META__MODEL: "gpt-4o-mini"
@@ -285,7 +232,7 @@ ai-review:
 
 See these folders for reference templates and full configuration options:
 
-- [./docs/ci](./docs/ci) — CI/CD integration templates (GitHub Actions, GitLab CI, Bitbucket Pipelines, Jenkins)
+- [./docs/ci](./docs/ci) — CI/CD integration templates for Docker-based CI jobs
 - [./docs/cli](./docs/cli) — CLI command reference and usage examples
 - [./docs/hooks](./docs/hooks) — hook reference and lifecycle events
 - [./docs/configs](./docs/configs) — full configuration examples (`.yaml`, `.json`, `.env`)
@@ -314,5 +261,4 @@ inside your infrastructure.
 
 🧠 **AI Review** — open-source AI-powered code reviewer
 
-- 📦 [PyPI](https://pypi.org/project/xai-review/)
-- 🐳 [DockerHub](https://hub.docker.com/r/nikitafilonov/ai-review)
+Build it locally with Docker and run it inside your own CI infrastructure.

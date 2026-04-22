@@ -2,7 +2,7 @@
   tags: [ build ]
   when: manual
   stage: review
-  image: nikitafilonov/ai-review:latest
+  image: registry.example.com/ai-review:latest
   rules:
     - if: '$CI_MERGE_REQUEST_IID'
   script:

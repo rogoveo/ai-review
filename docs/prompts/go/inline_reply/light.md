@@ -37,4 +37,4 @@ outline the relevant code.
 
 Follow the standard inline-reply format defined in the system prompt.  
 Return one short, relevant reply.  
-If no meaningful response is needed, output exactly: **No reply.**
+If no meaningful response is needed, output exactly: **Ответ не требуется.**

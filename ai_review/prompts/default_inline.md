@@ -5,4 +5,5 @@ Add inline comments for:
 - confusing or overly complex code,
 - improvements for readability or best practices.
 
+Write all review comments in Russian.
 Keep comments short, actionable, and relevant.  

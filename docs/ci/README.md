@@ -1,13 +1,20 @@
 # 📘 AI Review CI/CD Integration
 
-This folder contains **ready-to-use CI/CD templates** for running AI Review automatically on **Pull Requests** (GitHub,
-Bitbucket, Jenkins, Bitbucket, Azure DevOps) or **Merge Requests** (GitLab).
+This folder contains **ready-to-use CI/CD templates** for running AI Review from a Docker image on Pull/Merge Requests.
 
 Each example shows how to:
 
-- Install and configure AI Review
+- Use a prebuilt AI Review Docker image
 - Pass LLM and VCS credentials securely via environment variables
 - Trigger inline, summary, or context review commands
+
+Build and publish the image before using these templates:
+
+```bash
+docker build -t ai-review:local .
+docker tag ai-review:local registry.example.com/ai-review:latest
+docker push registry.example.com/ai-review:latest
+```
 
 ---
 
@@ -15,7 +22,6 @@ Each example shows how to:
 
 | Provider     | Template                                 | Description                                                                    |
 |--------------|------------------------------------------|--------------------------------------------------------------------------------|
-| GitHub       | [github.yaml](./github.yaml)             | Manual workflow dispatch from Actions tab                                      |
 | GitLab       | [gitlab.yaml](./gitlab.yaml)             | Manual job trigger in Merge Request pipelines                                  |
 | Jenkins      | [Jenkinsfile](./Jenkinsfile)             | Declarative pipeline with **inline/context/summary** review stages             |
 | Bitbucket    | [bitbucket.yaml](./bitbucket.yaml)       | Manual custom pipeline trigger per Pull Request (supports all AI Review modes) |

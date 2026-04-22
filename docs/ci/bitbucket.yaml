@@ -2,7 +2,7 @@
 # Bitbucket Pipelines configuration for AI Review
 # ============================================
 
-image: nikitafilonov/ai-review:latest
+image: registry.example.com/ai-review:latest
 
 options:
   size: 2x

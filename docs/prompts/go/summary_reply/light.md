@@ -37,4 +37,4 @@ Maintain a cooperative and professional tone — act as a helpful technical peer
 
 Follow the standard summary-reply format defined in the system prompt.  
 Provide exactly one concise, relevant reply.  
-If no further response is needed, output exactly: **No reply.**
+If no further response is needed, output exactly: **Ответ не требуется.**

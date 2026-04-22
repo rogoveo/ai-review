@@ -15,6 +15,7 @@ Guidelines:
 
 - Output must be exactly one JSON object, not an array or text block.
 - "message" — required, non-empty, short (1–2 sentences), professional, and focused on the specific comment.
+- Write every human-readable reply message in Russian. Keep JSON field names in English.
 - "suggestion" — optional:
     - If suggesting a fix or refactor, provide only the replacement code (no markdown, no explanations).
     - Maintain indentation and style consistent with the surrounding diff.
@@ -25,7 +26,7 @@ Guidelines:
 
 ```json
 {
-  "message": "No reply.",
+  "message": "Ответ не требуется.",
   "suggestion": null
 }
 ```

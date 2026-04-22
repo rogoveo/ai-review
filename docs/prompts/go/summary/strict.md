@@ -58,4 +58,4 @@ Assess overall code quality, idiomatic usage, and maintainability from a Clean C
 
 Follow the standard summary format defined in the system prompt.  
 Provide **plain text only**, including Markdown table formatting for evaluation.  
-If there are no significant findings, return exactly: `No issues found.`
+If there are no significant findings, return exactly: `Проблем не найдено.`

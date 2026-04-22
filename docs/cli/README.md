@@ -9,22 +9,22 @@ It is built with Typer and fully supports async execution of all review modes.
 
 ## 🚀 Quick Start
 
-After installing AI Review:
+Build the Docker image from the repository:
 
 ````bash
-pip install xai-review
+docker build -t ai-review:local .
 ````
 
-Run any command from your terminal:
+Run any command from a checked-out repository:
 
 ```bash
-ai-review run
+docker run --rm -v "$PWD:/workspace" -w /workspace --env-file .env ai-review:local ai-review run
 ```
 
 Or display help:
 
 ```bash
-ai-review --help
+docker run --rm ai-review:local
 ```
 
 ---

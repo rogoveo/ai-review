@@ -36,4 +36,4 @@ Highlight key strengths and only the most important issues.
 
 Follow the standard summary format defined in the system prompt.  
 Provide **plain text only**, without markdown or JSON.  
-If there are no issues, return exactly: `No issues found.`
+If there are no issues, return exactly: `Проблем не найдено.`

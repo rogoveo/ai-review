@@ -18,7 +18,7 @@
 #   • Variable group "ai-review-secrets" with:
 #       - LLM__HTTP_CLIENT__API_TOKEN  (e.g., OpenAI API key)
 #       - VCS__HTTP_CLIENT__API_TOKEN  (Azure DevOps PAT with Code → Read & Write permissions)
-#   • Docker image: nikitafilonov/ai-review:latest
+#   • Docker image: registry.example.com/ai-review:latest
 # ===============================
 
 trigger: none  # manual run from the UI
@@ -73,7 +73,7 @@ jobs:
   - job: ai_review
     displayName: "AI Review"
     container:
-      image: nikitafilonov/ai-review:latest
+      image: registry.example.com/ai-review:latest
 
     steps:
       - checkout: self

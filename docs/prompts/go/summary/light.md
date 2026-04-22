@@ -37,4 +37,4 @@ Highlight key improvements and the most important issues, focusing on clarity an
 
 Follow the standard summary format defined in the system prompt.  
 Keep it **plain text only** and limited to a few sentences.  
-If no issues are found, return exactly: `No issues found.`
+If no issues are found, return exactly: `Проблем не найдено.`

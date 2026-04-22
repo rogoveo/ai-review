@@ -1,4 +1,5 @@
 from ai_review.clients.gitlab.client import get_gitlab_http_client
+from ai_review.clients.gitlab.mr.client import GitLabMergeRequestsHTTPClientError
 from ai_review.clients.gitlab.mr.schema.discussions import GitLabCreateMRDiscussionRequestSchema
 from ai_review.clients.gitlab.mr.schema.position import GitLabPositionSchema
 from ai_review.config import settings
@@ -148,6 +149,12 @@ class GitLabVCSClient(VCSClientProtocol):
                 merge_request_id=self.merge_request_id,
             )
             logger.info(f"Created inline comment in {self.merge_request_ref} at {file}:{line}")
+        except GitLabMergeRequestsHTTPClientError as error:
+            logger.warning(
+                f"Failed to create inline comment in {self.merge_request_ref} at {file}:{line}: {error}. "
+                "Falling back to general MR comment."
+            )
+            await self.create_general_comment(f"**{file}:{line}**\n\n{message}")
         except Exception as error:
             logger.exception(f"Failed to create inline comment in {self.merge_request_ref} at {file}:{line}: {error}")
             raise

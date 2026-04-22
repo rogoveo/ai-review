@@ -43,4 +43,4 @@ Be analytical, direct, and constructive — your focus is correctness and best p
 
 Follow the standard summary-reply format defined in the system prompt.  
 Provide exactly one concise, technically relevant reply.  
-If no reply is needed, output exactly: **No reply.**
+If no reply is needed, output exactly: **Ответ не требуется.**

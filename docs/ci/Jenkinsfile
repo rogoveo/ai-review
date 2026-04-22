@@ -47,8 +47,9 @@ pipeline {
                       -e VCS__HTTP_CLIENT__API_URL \
                       -e VCS__HTTP_CLIENT__API_TOKEN \
                       -e CORE__CONCURRENCY \
-                      -v $(pwd):/app \
-                      nikitafilonov/ai-review:latest ai-review run-inline
+                      -v $(pwd):/workspace \
+                      -w /workspace \
+                      registry.example.com/ai-review:latest ai-review run-inline
                 '''
             }
         }
@@ -57,8 +58,9 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                      -v $(pwd):/app \
-                      nikitafilonov/ai-review:latest ai-review run-context
+                      -v $(pwd):/workspace \
+                      -w /workspace \
+                      registry.example.com/ai-review:latest ai-review run-context
                 '''
             }
         }
@@ -67,8 +69,9 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                      -v $(pwd):/app \
-                      nikitafilonov/ai-review:latest ai-review run-summary
+                      -v $(pwd):/workspace \
+                      -w /workspace \
+                      registry.example.com/ai-review:latest ai-review run-summary
                 '''
             }
         }

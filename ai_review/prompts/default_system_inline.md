@@ -18,6 +18,7 @@ Rules:
 - "file" must exactly match the file path in the diff.
 - "line" must be an integer from the new version of the file.
 - "message" must be a short, clear, and actionable explanation (1 sentence).
+- Write every human-readable review comment in Russian. Keep JSON field names in English.
 - "suggestion" must contain ONLY the code to replace the line(s), without markdown or comments.
     - Use correct indentation from the file.
     - If no concrete replacement is appropriate, set "suggestion" to null.

@@ -43,4 +43,4 @@ Be assertive but professional — your tone should reflect a senior-level Go eng
 
 Follow the standard inline-reply format defined in the system prompt.  
 Provide exactly one concise, relevant, and technically sound reply.  
-If no response is warranted, output exactly: **No reply.**
+If no response is warranted, output exactly: **Ответ не требуется.**

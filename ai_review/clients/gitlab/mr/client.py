@@ -81,7 +81,7 @@ class GitLabMergeRequestsHTTPClient(HTTPClient, GitLabMergeRequestsHTTPClientPro
     ) -> Response:
         return await self.post(
             f"/api/v4/projects/{project_id}/merge_requests/{merge_request_id}/discussions",
-            json=request.model_dump(),
+            json=request.model_dump(exclude_none=True),
         )
 
     @handle_http_error(client="GitLabMergeRequestsHTTPClient", exception=GitLabMergeRequestsHTTPClientError)

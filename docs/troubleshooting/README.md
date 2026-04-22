@@ -57,14 +57,6 @@ In that case `ai-review` must reconstruct the patch through local `git diff`, so
 
 Fetch full Git history before running `ai-review`.
 
-#### GitHub Actions
-
-```yaml
-- uses: actions/checkout@v4
-  with:
-    fetch-depth: 0
-```
-
 #### GitLab CI
 
 ```yaml
@@ -86,5 +78,4 @@ git cat-file -e "$HEAD_SHA^{commit}"
 ```
 
 For GitLab CI you can use the MR diff refs from the API response, or print the exact SHAs from the `ai-review` logs.
-
 

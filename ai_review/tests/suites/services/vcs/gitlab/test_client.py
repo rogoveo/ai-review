@@ -1,5 +1,6 @@
 import pytest
 
+from ai_review.clients.gitlab.mr.client import GitLabMergeRequestsHTTPClientError
 from ai_review.services.vcs.gitlab.client import GitLabVCSClient
 from ai_review.services.vcs.types import ReviewInfoSchema, ReviewCommentSchema, ReviewThreadSchema, ThreadKind
 from ai_review.tests.fixtures.clients.gitlab import FakeGitLabMergeRequestsHTTPClient
@@ -136,6 +137,29 @@ async def test_create_inline_comment_posts_comment(
     assert call_args["body"] == "Looks good!"
     assert call_args["project_id"] == "project-id"
     assert call_args["merge_request_id"] == "merge-request-id"
+
+
+@pytest.mark.asyncio
+@pytest.mark.usefixtures("gitlab_http_client_config")
+async def test_create_inline_comment_falls_back_to_general_comment(
+        gitlab_vcs_client: GitLabVCSClient,
+        fake_gitlab_merge_requests_http_client: FakeGitLabMergeRequestsHTTPClient,
+):
+    """Should create a general MR note if GitLab rejects the inline position."""
+    fake_gitlab_merge_requests_http_client.create_discussion_error = GitLabMergeRequestsHTTPClientError(
+        "400 Bad request - Note {:line_code=>[\"can't be blank\", \"must be a valid line code\"]}"
+    )
+
+    await gitlab_vcs_client.create_inline_comment("main.py", 5, "Looks good!")
+
+    calls = [
+        args for name, args in fake_gitlab_merge_requests_http_client.calls
+        if name == "create_note"
+    ]
+    assert len(calls) == 1
+    assert calls[0]["body"] == "**main.py:5**\n\nLooks good!"
+    assert calls[0]["project_id"] == "project-id"
+    assert calls[0]["merge_request_id"] == "merge-request-id"
 
 
 @pytest.mark.asyncio

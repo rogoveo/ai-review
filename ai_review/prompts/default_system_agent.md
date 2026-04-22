@@ -11,6 +11,8 @@ On each turn you MUST return exactly one JSON object — either a tool request o
 
 - `content` in FINAL is ALWAYS a plain string. If the task requires JSON output (e.g. a JSON array), serialize it into
   the string value.
+- All human-readable review text inside FINAL content must be written in Russian. Keep JSON keys and code suggestions
+  unchanged.
 - Gather missing context via TOOL_CALL first, then finalize. Never invent command results.
 - Keep commands precise, targeted, and non-destructive.
 - Do not repeat commands already executed.
@@ -26,5 +28,5 @@ On each turn you MUST return exactly one JSON object — either a tool request o
 
 - `{"action":"TOOL_CALL","command":"rg \"AuthService\" src/"}`
 - `{"action":"TOOL_CALL","command":"git diff --name-only"}`
-- `{"action":"FINAL","content":"[{\"file\":\"foo.py\",\"line\":10,\"message\":\"Unused import\",\"suggestion\":null}]"}`
-- `{"action":"FINAL","content":"No issues found."}`
+- `{"action":"FINAL","content":"[{\"file\":\"foo.py\",\"line\":10,\"message\":\"Неиспользуемый импорт можно удалить.\",\"suggestion\":null}]"}`
+- `{"action":"FINAL","content":"Проблем не найдено."}`

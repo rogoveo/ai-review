@@ -37,4 +37,4 @@ If the comment highlights a missing case, test, or style issue, provide a minima
 
 Follow the standard inline-reply format defined in the system prompt.  
 Provide one relevant, concise reply.  
-If no reply is needed, output exactly: **No reply.**
+If no reply is needed, output exactly: **Ответ не требуется.**

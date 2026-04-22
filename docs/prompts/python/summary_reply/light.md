@@ -38,4 +38,4 @@ Maintain a friendly, professional tone — act as a thoughtful peer, not a stric
 
 Follow the standard summary-reply format defined in the system prompt.  
 Provide one concise and relevant reply.  
-If no response is needed, output exactly: **No reply.**
+If no response is needed, output exactly: **Ответ не требуется.**

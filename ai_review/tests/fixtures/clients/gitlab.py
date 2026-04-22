@@ -31,6 +31,7 @@ from ai_review.services.vcs.gitlab.client import GitLabVCSClient
 class FakeGitLabMergeRequestsHTTPClient(GitLabMergeRequestsHTTPClientProtocol):
     def __init__(self):
         self.calls: list[tuple[str, dict]] = []
+        self.create_discussion_error: Exception | None = None
 
     async def get_changes(self, project_id: str, merge_request_id: str) -> GitLabGetMRChangesResponseSchema:
         self.calls.append(("get_changes", {"project_id": project_id, "merge_request_id": merge_request_id}))
@@ -136,6 +137,9 @@ class FakeGitLabMergeRequestsHTTPClient(GitLabMergeRequestsHTTPClientProtocol):
             merge_request_id: str,
             request: GitLabCreateMRDiscussionRequestSchema,
     ) -> GitLabCreateMRDiscussionResponseSchema:
+        if self.create_discussion_error:
+            raise self.create_discussion_error
+
         self.calls.append(
             (
                 "create_discussion",

@@ -56,4 +56,4 @@ Focus on maintainability, correctness, and adherence to Pythonic best practices.
 
 Follow the standard summary format defined in the system prompt.  
 Return **plain text only** — no JSON or markdown outside of the evaluation table.  
-If there are no issues, return exactly: `No issues found.`
+If there are no issues, return exactly: `Проблем не найдено.`
